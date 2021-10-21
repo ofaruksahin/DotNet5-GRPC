@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GRPCExampleShared.Core\GRPCExampleShared.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\GRPCExampleShared.Core\ProtoFiles\Greeter.proto" GrpcServices="Server">
+      <Link>Protos\Greeter.proto</Link>
+    </Protobuf>
+  </ItemGroup>
+
+</Project>
