@@ -9,3 +9,4 @@ Projenin amacı dotnet 5 ile birlikte;
 
 # Kullanılan Dökümantasyonlar
 * [Google GRPC Documentation](https://grpc.io/docs/what-is-grpc/)
+* [C# GRPC Documentation](https://docs.microsoft.com/en-us/aspnet/core/grpc/?view=aspnetcore-5.0)
