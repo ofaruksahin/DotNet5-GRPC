@@ -6,7 +6,7 @@ service Greeter{
 	rpc SayHello(HelloRequest) returns(HelloReply);
 	rpc StreamingFromServer(ExampleRequest) returns(stream ExampleResponse);
 	rpc StreamingForClient(stream ExampleRequest) returns (ExampleResponse);
-	rpc StreamingBothWays(stream ExampleRequest) returns(ExampleResponse);
+	rpc StreamingBothWays(stream ExampleRequest) returns(stream ExampleResponse);
 }
 
 message HelloRequest{

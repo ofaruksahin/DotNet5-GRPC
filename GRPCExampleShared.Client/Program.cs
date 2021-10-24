@@ -2,6 +2,7 @@
 using GRPCExampleShared.Core.ProtoFiles;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace GRPCExampleShared.Client
 {
@@ -17,6 +18,7 @@ namespace GRPCExampleShared.Client
     public class GRPCHelper
     {
         private string baseUrl => "https://localhost:44332/";
+
         public GRPCHelper()
         {
             Console.WriteLine("Select grpc method:");
@@ -31,6 +33,9 @@ namespace GRPCExampleShared.Client
                     break;
                 case "3":
                     StreamingFromClient();
+                    break;
+                case "4":
+                    StreamingBothWays();
                     break;
             }
         }
@@ -88,12 +93,42 @@ namespace GRPCExampleShared.Client
                 var request = client.StreamingForClient();
                 while (index != 5)
                 {
-                    await request.RequestStream.WriteAsync(new ExampleRequest());                    
+                    await request.RequestStream.WriteAsync(new ExampleRequest());
                     index++;
                 }
                 await request.RequestStream.CompleteAsync();
                 var res = await request.ResponseAsync;
                 Console.WriteLine(res.Message);
+            }
+        }
+
+        public async void StreamingBothWays()
+        {
+            using (GrpcChannel channel = GrpcChannel.ForAddress(baseUrl))
+            {
+                var client = new Greeter.GreeterClient(channel);
+                var request = client.StreamingBothWays();
+                var token = new CancellationToken();
+
+                var task = Task.Run(async () =>
+                {
+                    var index = 0;
+                    while (index != 5)
+                    {
+                        await request.RequestStream.WriteAsync(new ExampleRequest());
+                        index++;
+                        await Task.Delay(TimeSpan.FromSeconds(2));
+                    }
+                    await request.RequestStream.CompleteAsync();
+                });
+
+
+                while (await request.ResponseStream.MoveNext(token))
+                {
+                    var current = request.ResponseStream.Current;
+                    Console.WriteLine(current.Message);
+                }
+
             }
         }
     }

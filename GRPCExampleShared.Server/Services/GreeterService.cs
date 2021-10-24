@@ -34,5 +34,23 @@ namespace GRPCExampleShared.Server.Services
             }
             return new ExampleResponse() { Message = "Hello World"};
         }
+
+        public override async Task StreamingBothWays(IAsyncStreamReader<ExampleRequest> requestStream, IServerStreamWriter<ExampleResponse> responseStream, ServerCallContext context)
+        {
+            var readTask = Task.Run(async () =>
+            {
+                await foreach (var message in requestStream.ReadAllAsync())
+                {
+                    
+                }
+                return Task.CompletedTask;
+            });
+            
+            while (!readTask.IsCompleted)
+            {
+                await responseStream.WriteAsync(new ExampleResponse() { Message = "Hello World"});
+                await Task.Delay(TimeSpan.FromSeconds(2), context.CancellationToken);
+            }
+        }
     }
 }
