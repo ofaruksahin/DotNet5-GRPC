@@ -1,4 +1,10 @@
-﻿using Grpc.Net.Client;
+﻿using Google.Protobuf;
+using Google.Protobuf.Reflection;
+using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
+using Grpc.Net.Client;
+using Grpc.Net.Client.Configuration;
+using GRPCExampleShared.Core;
 using GRPCExampleShared.Core.ProtoFiles;
 using System;
 using System.Threading;
@@ -36,6 +42,9 @@ namespace GRPCExampleShared.Client
                     break;
                 case "4":
                     StreamingBothWays();
+                    break;
+                case "5":
+                    GetRoles();
                     break;
             }
         }
@@ -129,6 +138,35 @@ namespace GRPCExampleShared.Client
                     Console.WriteLine(current.Message);
                 }
 
+            }
+        }
+
+        public void GetRoles()
+        {
+            var defaultMethodConfig = new MethodConfig
+            {
+                Names = { MethodName.Default },
+                RetryPolicy = new RetryPolicy
+                {
+                    MaxAttempts = 5,
+                    InitialBackoff = TimeSpan.FromSeconds(1),
+                    MaxBackoff = TimeSpan.FromSeconds(5),
+                    BackoffMultiplier = 1.5,
+                    RetryableStatusCodes = { StatusCode.Unavailable }
+                }
+            };
+            using (GrpcChannel channel = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions
+            {
+                ServiceConfig = new ServiceConfig { MethodConfigs = { defaultMethodConfig } }
+            }))
+            {
+                var client = new Greeter.GreeterClient(channel);
+                var request = client.GetRoles(new HelloRequest { });
+
+                foreach (var item in request.Roles)
+                {
+                    Console.WriteLine($"{item.Id} - {item.Name}");
+                }
             }
         }
     }

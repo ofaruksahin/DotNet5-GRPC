@@ -14,6 +14,14 @@ namespace GRPCExampleShared.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddGrpc();
+
+            services.AddCors(o => o.AddPolicy("AllowAll", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .WithExposedHeaders("Grpc-Status", "Grpc-Message", "Grpc-Encoding", "Grpc-Accept-Encoding");
+            }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -26,9 +34,16 @@ namespace GRPCExampleShared.Server
 
             app.UseRouting();
 
+            app.UseGrpcWeb();
+
+            app.UseCors();
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<GreeterService>();
+                endpoints
+                    .MapGrpcService<GreeterService>()
+                    .EnableGrpcWeb()
+                    .RequireCors("AllowAll");
 
                 endpoints.MapGet("/", async context =>
                 {

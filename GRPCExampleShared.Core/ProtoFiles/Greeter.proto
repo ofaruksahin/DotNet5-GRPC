@@ -1,5 +1,7 @@
 ﻿syntax = "proto3";
 
+import "google/protobuf/any.proto";
+
 option csharp_namespace= "GRPCExampleShared.Core.ProtoFiles";
 
 service Greeter{
@@ -7,6 +9,7 @@ service Greeter{
 	rpc StreamingFromServer(ExampleRequest) returns(stream ExampleResponse);
 	rpc StreamingForClient(stream ExampleRequest) returns (ExampleResponse);
 	rpc StreamingBothWays(stream ExampleRequest) returns(stream ExampleResponse);
+	rpc GetRoles(HelloRequest) returns(RoleReply);
 }
 
 message HelloRequest{
@@ -25,4 +28,13 @@ message ExampleRequest{
 
 message ExampleResponse{
 	string message = 1;
+}
+
+message RoleReply{
+	repeated RoleItem roles = 1;
+}
+
+message RoleItem{
+		int32 id = 1;
+		string name = 2;
 }
