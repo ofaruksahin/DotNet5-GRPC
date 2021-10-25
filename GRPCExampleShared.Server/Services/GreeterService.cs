@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
-using GRPCExampleShared.Core;
 using GRPCExampleShared.Core.ProtoFiles;
+using GRPCExampleShared.Server.Filters;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Threading.Tasks;
 
@@ -56,6 +57,9 @@ namespace GRPCExampleShared.Server.Services
 
         public override Task<RoleReply> GetRoles(HelloRequest request, ServerCallContext context)
         {
+            var header = context.RequestHeaders.Get("Authorization");
+            context.GetHttpContext().Response.StatusCode = 401;
+            context.GetHttpContext().Response.CompleteAsync();
             var result = new RoleReply();
             result.Roles.Add(new RoleItem()
             {
